@@ -63,8 +63,29 @@ class AugmentationPipeline:
 
     def _apply_rotation(self, image: Image.Image) -> Image.Image:
         angle = random.uniform(*self.rotation_range)
-        # Expand=True keeps the entire rotated image visible
-        return image.rotate(angle, expand=True, fillcolor=(255, 255, 255))
+
+        # Use high-quality resampling for smooth rotation
+        # First, upscale the image for better quality
+        original_size = image.size
+        upscale_factor = 2
+        large_size = (image.width * upscale_factor, image.height * upscale_factor)
+
+        # Upscale with high-quality resampling
+        image_large = image.resize(large_size, Image.Resampling.LANCZOS)
+
+        # Rotate with high-quality resampling
+        rotated_large = image_large.rotate(angle, expand=True,
+                                          fillcolor=(255, 255, 255),
+                                          resample=Image.Resampling.BICUBIC)
+
+        # Calculate new size maintaining aspect ratio
+        scale = min(original_size[0] * upscale_factor / rotated_large.width,
+                   original_size[1] * upscale_factor / rotated_large.height)
+        new_size = (int(rotated_large.width * scale),
+                   int(rotated_large.height * scale))
+
+        # Downscale back with high-quality resampling
+        return rotated_large.resize(new_size, Image.Resampling.LANCZOS)
 
     def _apply_perspective(self, img_array: np.ndarray) -> np.ndarray:
         h, w = img_array.shape[:2]
@@ -83,8 +104,9 @@ class AugmentationPipeline:
         # Calculate perspective transform matrix
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
 
-        # Apply the perspective transformation
+        # Apply the perspective transformation with cubic interpolation for smoother results
         result = cv2.warpPerspective(img_array, matrix, (w, h),
+                                    flags=cv2.INTER_CUBIC,
                                     borderMode=cv2.BORDER_CONSTANT,
                                     borderValue=(255, 255, 255))
 

@@ -21,9 +21,6 @@ def main():
     parser.add_argument("--no-augmentation", action="store_true",
                        help="Disable image augmentation")
 
-    parser.add_argument("--export-format", choices=["tesseract", "yolo", "coco"],
-                       help="Export format for OCR training")
-
     parser.add_argument("--seed", type=int, help="Random seed for reproducibility")
 
     parser.add_argument("--preview", action="store_true",
@@ -68,12 +65,6 @@ def main():
 
         print(f"\nGenerated {len(results)} receipts")
         print(f"Output directory: {args.output_dir}")
-
-        # Export if requested
-        if args.export_format:
-            print(f"\nExporting in {args.export_format} format...")
-            export_info = generator.export_for_ocr_training(results, format=args.export_format)
-            print(f"Export complete: {export_info}")
 
         print("\nGeneration complete!")
         print(f"- Images saved to: {args.output_dir}/images/")
