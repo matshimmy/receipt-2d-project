@@ -72,6 +72,7 @@ The generator creates highly diverse receipts mimicking real-world variety:
 - **Header styles**: Minimal (name only), Compact (partial info), Standard, or Detailed (full address/phone)
 - **Footer styles**: Minimal, Compact, Spread, Standard, or Detailed with varying element placement
 - **Element presence**: Thank you messages (40-60% chance), transaction IDs (70% chance), addresses/phones randomly included
+- **Promotional text**: 50% of receipts include promotional paragraphs (surveys, coupons, websites, or random text) to train models to ignore non-essential information
 
 ### Visual Styles
 - **5 printer types**: Thermal, inkjet, dot matrix, modern POS, carbon copy
@@ -79,7 +80,7 @@ The generator creates highly diverse receipts mimicking real-world variety:
 - **4 font configurations**: Thermal classic (monospace), Modern POS (sans-serif), Boutique (mixed), Retro (dot matrix)
 
 ### Realistic Augmentations
-- Rotation (±3°), minimal blur (0-0.5), perspective distortion
+- Rotation (±3°), subtle blur (0-0.25 radius), perspective distortion
 - Noise, lighting variations, fold lines, occasional stains
 - Character spacing variations (condensed/normal/expanded)
 

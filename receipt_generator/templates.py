@@ -507,6 +507,95 @@ class ReceiptTemplate:
 
             return y_offset
 
+    def add_promotional_text(self, start_y: int) -> int:
+        """Add random promotional/marketing text at the bottom of receipts (50% chance)"""
+        import random
+        import string
+
+        # Add promotional text 50% of the time (increased from 30%)
+        if random.random() > 0.5:
+            return start_y
+
+        y_offset = start_y + 10  # Add some spacing first
+
+        # Different types of promotional content
+        promo_type = random.choice(["website", "survey", "rewards", "random_text", "coupon"])
+
+        if promo_type == "website":
+            # Website promotion
+            lines = [
+                "Visit us online at",
+                f"www.{''.join(random.choices(string.ascii_lowercase, k=8))}.com",
+                "for exclusive deals and offers!"
+            ]
+        elif promo_type == "survey":
+            # Survey invitation
+            lines = [
+                "Tell us about your experience!",
+                f"Survey Code: {random.randint(1000, 9999)}-{random.randint(100, 999)}",
+                "Complete online for a chance to win!"
+            ]
+        elif promo_type == "rewards":
+            # Rewards program
+            lines = [
+                "Join our rewards program!",
+                f"You could have earned {random.randint(10, 100)} points",
+                "Sign up at customer service"
+            ]
+        elif promo_type == "coupon":
+            # Coupon/discount
+            lines = [
+                f"Save {random.choice([10, 15, 20, 25])}% on your next visit!",
+                f"Coupon code: {''.join(random.choices(string.ascii_uppercase + string.digits, k=6))}",
+                f"Valid until {random.randint(1, 12)}/{random.randint(1, 28)}/{random.randint(24, 25)}"
+            ]
+        else:  # random_text
+            # Generate random paragraph-like text (gibberish for training)
+            # This helps the model learn to ignore non-essential text
+            num_lines = random.randint(3, 6)  # Increased from 2-4 to 3-6 lines
+            lines = []
+            for _ in range(num_lines):
+                # Generate random "words" of varying lengths
+                num_words = random.randint(6, 12)  # Increased from 4-10 words
+                words = []
+                for _ in range(num_words):
+                    word_length = random.randint(2, 10)  # Slightly longer words
+                    word = ''.join(random.choices(string.ascii_lowercase, k=word_length))
+                    words.append(word)
+                line = ' '.join(words)
+                # Capitalize first letter and maybe add punctuation
+                line = line[0].upper() + line[1:]
+                if random.random() < 0.4:  # Slightly more punctuation
+                    line += random.choice(['.', '!', '?', '...'])
+                lines.append(line)
+
+        # Add separator line sometimes (50% chance)
+        if random.random() < 0.5:
+            self.elements.append(ReceiptElement(
+                type=ElementType.LINE,
+                position=(self.padding, y_offset),
+                width=self.width - 2 * self.padding
+            ))
+            y_offset += 10
+
+        # Add the promotional text lines
+        for line in lines:
+            # Truncate if too long
+            if len(line) > 45:
+                line = line[:42] + "..."
+
+            self.elements.append(ReceiptElement(
+                type=ElementType.TEXT,
+                position=(self.width // 2, y_offset),
+                content=line,
+                font_size=random.choice([7, 8, 9]),
+                alignment=Alignment.CENTER,
+                element_type="promotional"
+            ))
+            y_offset += random.randint(12, 15)
+
+        return y_offset + 10
+
     def to_dict(self) -> Dict:
         return {
             'name': self.name,

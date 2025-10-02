@@ -188,11 +188,14 @@ class ReceiptBuilder:
             start_y=y + 10
         )
 
-        template.add_footer(
+        y = template.add_footer(
             transaction_id=transaction["transaction_id"],
             date_time=transaction["timestamp"],
             start_y=y + 10
         )
+
+        # Add promotional text at the bottom (30% chance)
+        template.add_promotional_text(start_y=y)
 
         # Render the receipt
         return self.renderer.render(template)

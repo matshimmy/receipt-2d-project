@@ -9,7 +9,7 @@ class AugmentationPipeline:
     def __init__(self,
                  rotation_range: Tuple[float, float] = (-3, 3),
                  noise_level: Tuple[float, float] = (0, 0.01),
-                 blur_range: Tuple[float, float] = (0, 0.5),  # Reduced from 1.5
+                 blur_range: Tuple[float, float] = (0, 0.25),  # Further reduced for subtler blur
                  brightness_range: Tuple[float, float] = (0.85, 1.15),
                  contrast_range: Tuple[float, float] = (0.9, 1.1),
                  perspective_distortion: float = 0.05,  # Reduced from 0.1
