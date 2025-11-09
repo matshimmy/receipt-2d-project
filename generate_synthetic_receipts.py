@@ -22,11 +22,15 @@ from receipt_generator.styles import ReceiptStyleManager, ReceiptStyle, ReceiptV
 
 
 class SyntheticReceiptGenerator:
-    def __init__(self, output_dir: str = "./data/synthetic", seed: Optional[int] = None):
+    def __init__(self, output_dir: str = "./data/synthetic", bbox_dir: Optional[str] = None, seed: Optional[int] = None):
         self.output_dir = Path(output_dir)
         self.images_dir = self.output_dir / "images"
         self.annotations_dir = self.output_dir / "annotations"
-        self.bbox_dir = self.output_dir / "bboxes"
+        # If bbox_dir is specified, use it directly; otherwise use default output_dir/bboxes
+        if bbox_dir is not None:
+            self.bbox_dir = Path(bbox_dir)
+        else:
+            self.bbox_dir = self.output_dir / "bboxes"
 
         self.product_db = ProductDatabase(seed=seed)
         self.builder = EnhancedReceiptBuilder()
@@ -263,7 +267,7 @@ class SyntheticReceiptGenerator:
                 result = self.generate_receipt(receipt_id, store_type)
                 results.append(result)
 
-                if (i + 1) % 10 == 0:
+                if (i + 1) % 100 == 0:
                     print(f"  {i + 1}/{count} completed")
             except Exception as e:
                 print(f"  Error on receipt {i}: {e}")
@@ -278,9 +282,9 @@ class SyntheticReceiptGenerator:
         return results
 
 
-def generate(count: int = 100, output_dir: str = "./data/synthetic", seed: Optional[int] = None):
+def generate(count: int = 100, output_dir: str = "./data/synthetic", bbox_dir: Optional[str] = None, seed: Optional[int] = None):
     """Main API function."""
-    generator = SyntheticReceiptGenerator(output_dir, seed)
+    generator = SyntheticReceiptGenerator(output_dir, bbox_dir, seed)
     return generator.generate_batch(count)
 
 
@@ -290,7 +294,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate synthetic receipts")
     parser.add_argument("--count", type=int, default=10, help="Number of receipts")
     parser.add_argument("--output", type=str, default="./data/synthetic", help="Output directory")
+    parser.add_argument("--bbox-dir", type=str, default=None, help="Bounding box output directory (if not specified, uses output_dir/bboxes)")
     parser.add_argument("--seed", type=int, help="Random seed")
 
     args = parser.parse_args()
-    generate(args.count, args.output, args.seed)
+    generate(args.count, args.output, args.bbox_dir, args.seed)
